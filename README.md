@@ -6,6 +6,10 @@ The Project Requirements for this are apply CRUD actions through code to Instagr
 
 Github Issues: [https://github.com/linkwaylive/nodestagram/issues](https://github.com/linkwaylive/nodestagram/issues)
 
+## Docs
+
+Github Pages: [https://linkwaylive.github.io/nodestagram/index.html](https://linkwaylive.github.io/nodestagram/index.html)
+
 ## Prerequisites
 
 Make sure you have [git](http://git-scm.com/) installed. For mac users here is a helpful link installing git with the xcode command line tools: [http://stackoverflow.com/questions/9329243/xcode-4-4-and-later-install-command-line-tools](http://stackoverflow.com/questions/9329243/xcode-4-4-and-later-install-command-line-tools).
