@@ -1,0 +1,32 @@
+{
+  "coverage": "18.75%",
+  "expectCount": 16,
+  "actualCount": 3,
+  "files": {
+    "src/index.js": {
+      "expectCount": 12,
+      "actualCount": 3,
+      "undocumentLines": [
+        129,
+        15,
+        35,
+        36,
+        37,
+        177,
+        168,
+        33,
+        34
+      ]
+    },
+    "src/utils/auth_util.js": {
+      "expectCount": 4,
+      "actualCount": 0,
+      "undocumentLines": [
+        32,
+        21,
+        17,
+        13
+      ]
+    }
+  }
+}

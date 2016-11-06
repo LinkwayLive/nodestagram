@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/index.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/index.js~InstagramApi.html">InstagramApi</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">utils</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-generateSignature">generateSignature</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-generateUserAgent">generateUserAgent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectRandom">selectRandom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-timestamp">timestamp</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/index.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import { createReadStream } from &apos;fs&apos;;
+import { v1 as uuidV1 } from &apos;uuid&apos;;
+import { extend } from &apos;lodash&apos;;
+import { default as request } from &apos;./utils/request_util&apos;;
+import { timestamp, generateUserAgent, generateSignature } from &apos;./utils/auth_util&apos;;
+
+const jar = request.jar;
+
+/**
+ * Class InstagramApi contains all the methods needed to interact
+ * with instagram.
+ * @class InstagramApi
+ */
+export default class InstagramApi {
+  constructor(config = { debug: false }) {
+    const {
+      username,
+      password
+    } = config;
+
+    if (!username) {
+      const errMsgKey = &apos;Username missing.&apos;;
+      throw new Error(errMsgKey);
+    }
+
+    if (!password) {
+      const errMsgPass = &apos;Password missing.&apos;;
+      throw new Error(errMsgPass);
+    }
+
+    extend(this, config);
+
+    this.uid = uuidV1();
+    this.userAgent = generateUserAgent();
+    this.deviceId = &apos;android-4bca48fddbe5477d&apos;;
+    this.endpointUrl = &apos;https://i.instagram.com/api/v1&apos;;
+    this.jar = jar();
+
+    // Provide a default logger via console
+    if (!this.log &amp;&amp; this.debug) {
+      this.log = function log(val) {
+        console.log(val); // eslint-disable-line no-console
+      };
+      return this;
+    }
+
+    this.log = function noop() {
+    };
+    return this;
+  }
+
+  /**
+   * Method to generate the session to Instagram.
+   * @method login
+   * @return {Object} Whether or not the promise is fulfilled.
+   */
+  login() {
+    this.log(&apos;login&apos;);
+    const conf = JSON.stringify({
+      device_id: this.deviceId,
+      _uuid: this.uid,
+      username: this.username,
+      password: this.password,
+      _csrftoken: &apos;missing&apos;,
+      login_attempt_count: 0
+    });
+
+    const signature = generateSignature(conf);
+
+    return request.postAsync({
+      uri: `${this.endpointUrl}/accounts/login/`,
+      headers: {
+        &apos;USER-AGENT&apos;: this.userAgent
+      },
+      jar: this.jar,
+      form: {
+        signed_body: `${signature}.${conf}`,
+        ig_sig_key_version: 4
+      }
+    }).then(function parseBodyLogin(resp) {
+      this.log(&apos;parseBodyLogin&apos;);
+
+      const body = JSON.parse(resp.body);
+      if (body.status !== &apos;ok&apos;) {
+        throw new Error(body);
+      }
+      return body;
+    }.bind(this));
+  }
+
+  /**
+   * Method to create a photo in instagram from a local filepath.
+   * @method uploadPhoto
+   * @return {Object} Whether or not the promise is fulfilled.
+   */
+  uploadPhoto(source, captionText, isFilePath) {
+    this.log(&apos;uploadPhoto&apos;);
+    const stamp = timestamp();
+    const formData = {
+      _csrftoken: &apos;missing&apos;,
+      upload_id: stamp,
+      device_id: this.deviceId,
+      _uuid: this.uid,
+      image_compression: &apos;{&quot;lib_name&quot;:&quot;jt&quot;,&quot;lib_version&quot;:&quot;1.3.0&quot;,&quot;quality&quot;:&quot;70&quot;}&apos;,
+      filename: `pending_media_${stamp}.jpg`,
+      photo: (isFilePath ? createReadStream(source) : request.get({ uri: source }))
+    };
+    return request.postAsync({
+      headers: {
+        &apos;USER-AGENT&apos;: this.userAgent
+      },
+      uri: `${this.endpointUrl}/upload/photo/`,
+      jar: this.jar,
+      formData
+    }).then(function parseBodyPhotoId(resp) {
+      this.log(&apos;parseBodyPhotoId&apos;);
+      this.log(resp.body);
+
+      const body = JSON.parse(resp.body);
+      if (!body.upload_id) {
+        throw new Error(resp.body);
+      }
+      const uploadId = body.upload_id;
+      return { uploadId, captionText };
+    }.bind(this))
+      .then(this.configurePhoto.bind(this));
+  }
+
+  configurePhoto({
+    uploadId,
+    captionText
+  }) {
+    this.log(&apos;configurePhoto&apos;);
+    const conf = JSON.stringify({
+      device_id: this.deviceId,
+      _uuid: this.uid,
+      _csrftoken: &apos;missing&apos;,
+      media_id: uploadId,
+      caption: captionText,
+      device_timestamp: timestamp(),
+      source_type: &apos;5&apos;,
+      filter_type: &apos;0&apos;,
+      extra: &apos;{}&apos;,
+      &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded; charset=UTF-8&apos;
+    });
+    const signature = generateSignature(conf);
+    return request.postAsync({
+      uri: `${this.endpointUrl}/media/configure/`,
+      headers: {
+        &apos;USER-AGENT&apos;: this.userAgent
+      },
+      jar: this.jar,
+      form: {
+        signed_body: `${signature}.${conf}`,
+        ig_sig_key_version: 4
+      }
+    }).then(function parseBodyConfigure(resp) {
+      this.log(&apos;parseBodyConfigure&apos;);
+      this.log(resp.body);
+      const body = JSON.parse(resp.body);
+      if (body.status !== &apos;ok&apos;) {
+        throw new Error(resp.body);
+      }
+      return body;
+    }.bind(this));
+  }
+
+  postFromUrl(url, caption) {
+    this.log(&apos;postFromUrl&apos;);
+    return this.login()
+      .then(function uploadFromUrl() {
+        this.log(&apos;uploadFromUrl&apos;);
+        return this.uploadPhoto(url, caption);
+      }.bind(this));
+  }
+
+  postFromFilepath(filepath, caption) {
+    return this.login()
+      .then(function uploadFromFilePath() {
+        return this.uploadPhoto(filepath, caption, true);
+      }.bind(this));
+  }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.8)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

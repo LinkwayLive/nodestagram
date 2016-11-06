@@ -1,0 +1,71 @@
+{
+  "name": "nodestagram",
+  "version": "1.0.0",
+  "description": "Apply crud actions to Instagram.",
+  "main": "dist/index.js",
+  "private": false,
+  "scripts": {
+    "start": "gulp dev",
+    "test": "gulp test",
+    "unit-test": "gulp unit-test",
+    "integration-test": "gulp integration-test",
+    "precommit": "npm test",
+    "js-lint-fix": "gulp js-lint-fix",
+    "docs": "gulp js-doc",
+    "clean": "gulp clean",
+    "build": "gulp babel-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/linkwaylive/nodestagram.git"
+  },
+  "keywords": [
+    "instagram",
+    "instagram upload client"
+  ],
+  "authors": [
+    "linkwaylive@gmail.com"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/linkwaylive/nodestagram/issues"
+  },
+  "homepage": "https://github.com/linkwaylive/nodestagram/#readme",
+  "dependencies": {
+    "bluebird": "3.0.6",
+    "lodash": "4.16.4",
+    "request": "2.75.0",
+    "uuid": "2.0.1"
+  },
+  "devDependencies": {
+    "babel": "6.5.2",
+    "babel-core": "6.17.0",
+    "babel-eslint": "7.0.0",
+    "babel-loader": "6.2.5",
+    "babel-preset-node6": "11.0.0",
+    "babel-runtime": "6.11.6",
+    "chai": "3.5.0",
+    "del": "2.2.0",
+    "eslint": "3.8.1",
+    "eslint-config-airbnb": "12.0.0",
+    "eslint-plugin-import": "1.16.0",
+    "eslint-plugin-jsx-a11y": "2.2.3",
+    "eslint-plugin-react": "6.4.1",
+    "gulp": "3.9.1",
+    "gulp-babel": "6.1.2",
+    "gulp-changed": "1.3.2",
+    "gulp-esdoc": "0.3.0",
+    "gulp-eslint": "3.0.1",
+    "gulp-if": "2.0.1",
+    "gulp-mocha": "3.0.1",
+    "gulp-util": "3.0.7",
+    "husky": "0.11.9",
+    "mocha.parallel": "0.12.0",
+    "pretty-error": "2.0.0",
+    "require-dir": "0.3.1",
+    "run-sequence": "1.2.2",
+    "should": "8.3.1",
+    "sinon": "1.17.4",
+    "type-detect": "4.0.0"
+  }
+}
