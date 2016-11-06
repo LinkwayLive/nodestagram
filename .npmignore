@@ -1,0 +1,9 @@
+src
+gulpfile.babel.js
+test
+.babelrc
+.editorconfig
+.gitignore
+CHANGELOG.md
+credentials.json
+credentials-example.json
